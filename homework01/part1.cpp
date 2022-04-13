@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <iomanip>
+#include <sstream>
 using namespace std;
 
 string to_hexadecimal(int n)
