@@ -128,13 +128,13 @@ int main(int argc, const char *argv[])
     }
 
     ifstream inp(argv[1], ifstream::binary);
-    if (!inp.is_open())
+    if (!inp)
     {
         cout << "Could not open input file \"" + string(argv[1]) + "\"" << endl;
         return -2;
     }
     ofstream out(argv[2]);
-    if (!out.is_open())
+    if (!out)
     {
         cout << "Could not open output file \"" + string(argv[2]) + "\"" << endl;
         return -3;
