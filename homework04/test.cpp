@@ -17,4 +17,5 @@ int main()
     // string myString = "hi";
     // myString.append(" there cutie!");
     // cout << myString << endl;
+    // to add just 1 char to end, use myString.push_back(char)  // it's faster.
 }
