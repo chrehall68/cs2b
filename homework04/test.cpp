@@ -13,6 +13,13 @@ int main()
     myMap.get_or_insert(15) = "11";
     myMap.print();
 
+    cout << sizeof(BSTMap<int, int>::Node) << endl;
+
+    myMap = BSTMap<int, string>();
+    myMap.get_or_insert(11) = "new stuff";
+    myMap.get_or_insert(13) = "cool";
+    myMap.print();
+
     // random string tests.
     // string myString = "hi";
     // myString.append(" there cutie!");
