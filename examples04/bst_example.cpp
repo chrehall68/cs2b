@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ostream>
 #include <string>
 #include <map>
 #include <fstream>
@@ -18,6 +19,15 @@ private:
         {
             delete _left;
             delete _right;
+        }
+        friend ostream &operator<<(ostream &os, Node &n)
+        {
+            if (n._left != nullptr)
+                os << *n._left;
+            os << n._key << ": " << n._val << endl;
+            if (n._right != nullptr)
+                os << *n._right;
+            return os;
         }
     };
     Node *_root;
@@ -47,16 +57,31 @@ public:
     {
         delete _root;
     }
+
+    friend ostream &operator<<(ostream &os, BST &bst)
+    {
+        if (bst._root != nullptr)
+            return os << "{\n"
+                      << *bst._root << "}";
+        return os << "{}";
+    }
 };
 
 int main()
 {
-    BST<string, int> mymap(0);
-    ifstream inp("./macbeth.txt");
-    string word;
-    while (inp >> word)
-        mymap.get_or_insert(word)++;
+    // BST<string, int> mymap(0);
+    // ifstream inp("./macbeth.txt");
+    // string word;
+    // while (inp >> word)
+    //     mymap.get_or_insert(word)++;
 
-    cout << mymap.get_or_insert("the") << endl;
-    return 0;
+    // cout << mymap.get_or_insert("the") << endl;
+    // return 0;
+
+    BST<int, int> myMap(0);
+    for (int i = 0; i < 1000; i++)
+    {
+        myMap.get_or_insert(rand() % 100)++;
+    }
+    cout << myMap << endl;
 }
