@@ -10,8 +10,7 @@ using std::cout;
 using std::endl;
 using std::list;
 
-int main(int argc, const char* argv[])
-{
+int main(int argc, const char* argv[]) {
     list<char32_t> animal_list = {0x1F431, 0x1F432, 0x1F434, 0x1F435, U'🐶'};
     UTF8String str(animal_list);
 
@@ -35,5 +34,7 @@ int main(int argc, const char* argv[])
     // raised_hand with medium_skin_tone
     UTF8String rhwmst = raised_hand + medium_skin_tone;
     cout << raised_hand << " + " << medium_skin_tone << " == " << rhwmst << endl;
+    cout << rhwmst[0] << rhwmst[1] << endl;
+    cout << UTF8String(U"🍎🍌🥥")[1] << endl;
     return 0;
 }

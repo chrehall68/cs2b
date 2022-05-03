@@ -19,6 +19,7 @@ class UTF8CodePoint {
     UTF8CodePoint(char32_t code_point);
 
     // TODO: Make it so we can static_cast a UTF8CodePoint to a char32_t
+    operator char32_t();
 
     friend ostream& operator<<(ostream& os, const UTF8CodePoint cp);
     friend istream& operator>>(istream& is, UTF8CodePoint& cp);

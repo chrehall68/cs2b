@@ -8,21 +8,17 @@ UTF8CodePoint::UTF8CodePoint(char32_t code_point) : code_point(code_point) {}
 // |           U+0080 | 110xxxxx | 10xxxxxx |          |          |
 // |           U+0800 | 1110xxxx | 10xxxxxx | 10xxxxxx |          |
 // |          U+10000 | 11110xxx | 10xxxxxx | 10xxxxxx | 10xxxxxx |
-ostream& operator<<(ostream& os, const UTF8CodePoint cp)
-{
+ostream& operator<<(ostream& os, const UTF8CodePoint cp) {
     if (cp.code_point < 0x80) {
         os.put(cp.code_point);
-    }
-    else if (cp.code_point < 0x800) {
+    } else if (cp.code_point < 0x800) {
         os.put(0b1100'0000 | (cp.code_point >> 6 & 0b0001'1111));
         os.put(0b1000'0000 | (cp.code_point & 0b0011'1111));
-    }
-    else if (cp.code_point < 0x10000) {
+    } else if (cp.code_point < 0x10000) {
         os.put(0b1110'0000 | (cp.code_point >> 12 & 0b0000'1111));
         os.put(0b1000'0000 | (cp.code_point >> 6 & 0b0011'1111));
         os.put(0b1000'0000 | (cp.code_point & 0b0011'1111));
-    }
-    else {  // if (cp.code_point < 0x200000)
+    } else {  // if (cp.code_point < 0x200000)
         os.put(0b1111'0000 | (cp.code_point >> 18 & 0b0000'0111));
         os.put(0b1000'0000 | (cp.code_point >> 12 & 0b0011'1111));
         os.put(0b1000'0000 | (cp.code_point >> 6 & 0b0011'1111));
@@ -37,8 +33,7 @@ ostream& operator<<(ostream& os, const UTF8CodePoint cp)
 // |           U+0080 | 110xxxxx | 10xxxxxx |          |          |
 // |           U+0800 | 1110xxxx | 10xxxxxx | 10xxxxxx |          |
 // |          U+10000 | 11110xxx | 10xxxxxx | 10xxxxxx | 10xxxxxx |
-istream& operator>>(istream& is, UTF8CodePoint& cp)
-{
+istream& operator>>(istream& is, UTF8CodePoint& cp) {
     unsigned char bytes[4];
     is.read(reinterpret_cast<char*>(&bytes[0]), 1);
 
@@ -49,17 +44,13 @@ istream& operator>>(istream& is, UTF8CodePoint& cp)
     int num_bytes;
     if ((bytes[0] & 0b1000'0000) == 0b0000'0000) {
         num_bytes = 1;
-    }
-    else if ((bytes[0] & 0b1110'0000) == 0b1100'0000) {
+    } else if ((bytes[0] & 0b1110'0000) == 0b1100'0000) {
         num_bytes = 2;
-    }
-    else if ((bytes[0] & 0b1111'0000) == 0b1110'0000) {
+    } else if ((bytes[0] & 0b1111'0000) == 0b1110'0000) {
         num_bytes = 3;
-    }
-    else if ((bytes[0] & 0b1111'1000) == 0b1111'0000) {
+    } else if ((bytes[0] & 0b1111'1000) == 0b1111'0000) {
         num_bytes = 4;
-    }
-    else {
+    } else {
         is.putback(bytes[0]);
         is.setstate(std::ios_base::failbit);
         return is;
@@ -104,4 +95,8 @@ istream& operator>>(istream& is, UTF8CodePoint& cp)
 
     // Should never reach this line
     return is;
+}
+
+UTF8CodePoint::operator char32_t() {
+    return code_point;
 }
