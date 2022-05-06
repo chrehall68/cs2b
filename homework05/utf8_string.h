@@ -39,6 +39,7 @@ class UTF8String {
     // TODO: Make it so I can index into a UTF8String to get a UTF8CodePoint&...
     // like how I can index into an std::string and get back a char&.
     // So UTF8String(U"🍎🍌🥥")[1] == UTF8CodePoint(U'🍌')
+    UTF8CodePoint& operator[](size_t idx);
     UTF8CodePoint operator[](size_t idx) const;
 
     UTF8String& operator+=(const UTF8String& other);
