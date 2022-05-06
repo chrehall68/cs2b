@@ -35,6 +35,9 @@ int main(int argc, const char* argv[]) {
     UTF8String rhwmst = raised_hand + medium_skin_tone;
     cout << raised_hand << " + " << medium_skin_tone << " == " << rhwmst << endl;
     cout << rhwmst[0] << rhwmst[1] << endl;
-    cout << UTF8String(U"🍎🍌🥥")[1] << endl;
+
+    UTF8String idxtest = "apple";
+    idxtest[0] = UTF8CodePoint(127815);
+    cout << idxtest << endl;
     return 0;
 }

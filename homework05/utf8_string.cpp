@@ -53,6 +53,9 @@ UTF8String operator+(UTF8CodePoint a, UTF8CodePoint b) {
     return result;
 }
 
+UTF8CodePoint& UTF8String::operator[](size_t idx) {
+    return data[idx];
+}
 UTF8CodePoint UTF8String::operator[](size_t idx) const {
     return data[idx];
 }
