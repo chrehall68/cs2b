@@ -1,0 +1,139 @@
+#include <iomanip>
+#include <iostream>
+#include <vector>
+using namespace std;
+
+template <typename K, typename V>
+class AVL {
+   private:
+    struct Node {
+        K _key;
+        V _val;
+        Node *_left, *_right;
+        Node(K key, V val) : _key(key), _val(val), _left(nullptr), _right(nullptr){};
+        Node(const Node &other) : _key(other._key), _val(other._val), _left(nullptr), _right(nullptr) {
+            if (other._left != nullptr) _left = new Node(*other._left);
+            if (other._right != nullptr) _right = new Node(*other._right);
+        }
+        ~Node() {
+            delete _left;
+            delete _right;
+        }
+        friend ostream &operator<<(ostream &os, const Node &n) {
+            if (n._left != nullptr)
+                os << *n._left;
+            os << n._key << ": " << n._val << endl;
+            if (n._right != nullptr)
+                os << *n._right;
+            return os;
+        }
+
+        // this only returns the key:value pair
+        string to_string() const {
+            ostringstream ret;
+            ret << _key << ": " << _val;
+            return ret.str();
+        }
+
+        // height of 1 is the current generation
+        int height() const {
+            if (_left == nullptr && _right == nullptr) {
+                return 1;
+            }
+            if (_left != nullptr && _right != nullptr) {
+                return 1 + max(_left->height(), _right->height());
+            }
+            if (_left != nullptr) return 1 + _left->height();
+            return 1 + _right->height();
+        }
+
+        // generation 1 is the current generation
+        vector<Node *> get_nth_gen(int n, vector<Node *> &v) {
+            if (n == 1) {
+                v.push_back(this);
+            } else {
+                if (_left != nullptr)
+                    _left->get_nth_gen(n - 1, v);
+                else {
+                    for (int i = 0; i < (1 << (n - 2)); i++) v.push_back(nullptr);
+                }
+                if (_right != nullptr)
+                    _right->get_nth_gen(n - 1, v);
+                else {
+                    for (int i = 0; i < (1 << (n - 2)); i++) v.push_back(nullptr);
+                }
+            }
+            return v;
+        }
+        // generation 1 is the current generation
+        vector<Node *> get_nth_gen(int n) {
+            vector<Node *> ret;
+            return get_nth_gen(n, ret);
+        }
+    };
+    Node *_root;
+    V _default_val;
+
+    V &get_or_insert(K key, Node *&cur) {
+        if (cur == nullptr) {
+            cur = new Node(key, _default_val);
+            return cur->_val;
+        }
+        if (cur->_key == key)
+            return cur->_val;
+        if (key < cur->_key)
+            return get_or_insert(key, cur->_left);
+        return get_or_insert(key, cur->_right);
+    }
+
+   public:
+    AVL() : _root(nullptr) { _default_val = K(); };
+    AVL(V default_val) : _root(nullptr), _default_val(default_val){};
+    AVL(const AVL &other) : _root(nullptr) {
+        if (other._root != nullptr) _root = new Node(*other._root);
+    }
+    V &get_or_insert(K key) {
+        return get_or_insert(key, _root);
+    }
+    ~AVL() {
+        delete _root;
+    }
+
+    friend ostream &operator<<(ostream &os, AVL &AVL) {
+        if (AVL._root != nullptr)
+            return os << "{\n"
+                      << *AVL._root << "}";
+        return os << "{}";
+    }
+
+    void print_structure() {
+        if (_root == nullptr) {
+            cout << "{}" << endl;
+            return;
+        }
+        int spacing = 6;
+        int width = spacing * (1 << _root->height());
+        cout << "height is " << _root->height() << endl;
+        for (int i = 1; i <= _root->height(); i++) {
+            cout << setw((width - spacing * (1 << i - 1)) / 2) << "";
+            for (Node *n : _root->get_nth_gen(i)) {
+                if (n == nullptr)
+                    cout << setw(spacing) << "null";
+                else
+                    cout << setw(spacing) << n->to_string();
+            }
+            cout << endl;
+        }
+    }
+};
+
+int main() {
+    AVL<int, int> myAvl(0);
+    myAvl.get_or_insert(0) = 33;
+    myAvl.get_or_insert(-1) = 22;
+    myAvl.get_or_insert(-2) = 11;
+    myAvl.get_or_insert(-3) = 1;
+    cout << myAvl << endl;
+    myAvl.print_structure();
+    // todo - add left-right, left, right-left, right rotations
+}
