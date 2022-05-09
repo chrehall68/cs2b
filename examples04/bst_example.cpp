@@ -79,8 +79,14 @@ int main() {
     for (int i = 0; i < 1000; i++) {
         myMap.get_or_insert(rand() % 100)++;
     }
-    cout << myMap << endl;
+    cout << myMap.get_or_insert(1) << endl;
 
     BST<int, int> myOtherMap(myMap);
+    cout << myOtherMap.get_or_insert(1) << endl;
+    myOtherMap.get_or_insert(1) = 33;
+    cout << myMap.get_or_insert(1) << endl;
+    cout << myOtherMap.get_or_insert(1) << endl;
+
+    cout << myMap << endl;
     cout << myOtherMap << endl;
 }
