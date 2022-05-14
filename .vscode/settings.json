@@ -18,7 +18,8 @@
         "unordered_map": "cpp",
         "*.tcc": "cpp",
         "ios": "cpp",
-        "system_error": "cpp"
+        "system_error": "cpp",
+        "stdexcept": "cpp"
     },
     "C_Cpp.clang_format_fallbackStyle": "{BasedOnStyle: Google, IndentWidth: 4, TabWidth: 4, ColumnLimit: 0}"
 }
