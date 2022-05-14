@@ -46,6 +46,17 @@ class AVL {
             if (_left != nullptr) return 1 + _left->height();
             return 1 + _right->height();
         }
+        int balance() const {
+            int left_h = 0;
+            if (_left != nullptr) {
+                left_h = _left->height();
+            }
+            int right_h = 0;
+            if (_right != nullptr) {
+                right_h = _right->height();
+            }
+            return right_h - left_h;
+        }
 
         // generation 1 is the current generation
         vector<Node *> get_nth_gen(int n, vector<Node *> &v) {
@@ -71,19 +82,93 @@ class AVL {
             return get_nth_gen(n, ret);
         }
     };
+    class KeyNotFoundException : public logic_error {
+       public:
+        KeyNotFoundException(const char *what) : logic_error(what){};
+    };
     Node *_root;
     V _default_val;
 
-    V &get_or_insert(K key, Node *&cur) {
+    Node *left_rotate(Node *cur) {
+        Node *ret = cur->_right;
+        Node *orphaned_tree = cur->_right->_left;
+        ret->_left = cur;
+        cur->_right = orphaned_tree;
+        return ret;
+    }
+    Node *right_rotate(Node *cur) {
+        Node *ret = cur->_left;
+        Node *orphaned_tree = cur->_left->_right;
+        ret->_right = cur;
+        cur->_left = orphaned_tree;
+        return ret;
+    }
+
+    Node *set_or_insert(K key, V value, Node *&cur) {
         if (cur == nullptr) {
-            cur = new Node(key, _default_val);
-            return cur->_val;
+            cur = new Node(key, value);
+            return cur;
+        }
+
+        if (cur->_key == key) {
+            cur->_val = value;
+            return cur;
+        } else if (key < cur->_key) {
+            set_or_insert(key, value, cur->_left);
+        } else {
+            set_or_insert(key, value, cur->_right);
+        }
+
+        int balance = cur->balance();
+        if (abs(balance) > 1) {
+            // left cases
+            if (balance > 1) {
+                int child_balance = cur->_right->balance();
+
+                // left left case
+                if (child_balance > 0) {
+                    cur = left_rotate(cur);
+                }
+
+                // right left case
+                if (child_balance < 0) {
+                    cur->_right = right_rotate(cur->_right);
+                    cur = left_rotate(cur);
+                }
+            }
+
+            // right cases
+            if (balance < 1) {
+                int child_balance = cur->_left->balance();
+
+                // right right case
+                if (child_balance < 0) {
+                    cur = right_rotate(cur);
+                }
+
+                // left right case
+                if (child_balance > 0) {
+                    cur->_left = left_rotate(cur->_left);
+                    cur = right_rotate(cur);
+                }
+            }
+        }
+
+        return cur;
+    }
+
+    V &get(K key, Node *cur) {
+        if (cur == nullptr) {
+            throw KeyNotFoundException("No matching key found!!");
         }
         if (cur->_key == key)
             return cur->_val;
         if (key < cur->_key)
-            return get_or_insert(key, cur->_left);
-        return get_or_insert(key, cur->_right);
+            return get(key, cur->_left);
+        return get(key, cur->_right);
+    }
+    Node *set_or_insert(K key) {
+        return set_or_insert(key, _default_val, _root);
     }
 
    public:
@@ -92,20 +177,27 @@ class AVL {
     AVL(const AVL &other) : _root(nullptr) {
         if (other._root != nullptr) _root = new Node(*other._root);
     }
-    V &get_or_insert(K key) {
-        return get_or_insert(key, _root);
-    }
     ~AVL() {
         delete _root;
     }
 
+    // will throw errors if key not found
+    V operator[](K key) const {
+        return get(key, _root);
+    }
+
+    // guaranteed to not throw errors
+    V &operator[](K key) {
+        return set_or_insert(key)->_val;
+    }
+
+    // printing util
     friend ostream &operator<<(ostream &os, AVL &AVL) {
         if (AVL._root != nullptr)
             return os << "{\n"
                       << *AVL._root << "}";
         return os << "{}";
     }
-
     void print_structure() {
         if (_root == nullptr) {
             cout << "{}" << endl;
@@ -113,7 +205,7 @@ class AVL {
         }
         int spacing = 6;
         int width = spacing * (1 << _root->height());
-        cout << "height is " << _root->height() << endl;
+
         for (int i = 1; i <= _root->height(); i++) {
             cout << setw((width - spacing * (1 << i - 1)) / 2) << "";
             for (Node *n : _root->get_nth_gen(i)) {
@@ -122,18 +214,39 @@ class AVL {
                 else
                     cout << setw(spacing) << n->to_string();
             }
-            cout << endl;
+            cout << "\n\n";
         }
     }
 };
 
 int main() {
-    AVL<int, int> myAvl(0);
-    myAvl.get_or_insert(0) = 33;
-    myAvl.get_or_insert(-1) = 22;
-    myAvl.get_or_insert(-2) = 11;
-    myAvl.get_or_insert(-3) = 1;
-    cout << myAvl << endl;
-    myAvl.print_structure();
-    // todo - add left-right, left, right-left, right rotations
+    AVL<int, int> leftRightRotateTest(0);
+    leftRightRotateTest[13] = 0;
+    leftRightRotateTest[10] = 0;
+    leftRightRotateTest[15] = 0;
+    leftRightRotateTest[16] = 0;
+    leftRightRotateTest[5] = 0;
+    leftRightRotateTest[11] = 0;
+    leftRightRotateTest[4] = 0;
+    leftRightRotateTest[6] = 0;
+    leftRightRotateTest.print_structure();
+
+    leftRightRotateTest[7] = 0;
+    leftRightRotateTest.print_structure();
+
+    AVL<int, int> rightLeftRotateTest(0);
+    rightLeftRotateTest[20] = 0;
+    rightLeftRotateTest[25] = 0;
+    rightLeftRotateTest[15] = 0;
+    rightLeftRotateTest[13] = 0;
+    rightLeftRotateTest[30] = 0;
+    rightLeftRotateTest[22] = 0;
+    rightLeftRotateTest[27] = 0;
+    rightLeftRotateTest[31] = 0;
+    rightLeftRotateTest.print_structure();
+    rightLeftRotateTest[28] = 0;
+    rightLeftRotateTest.print_structure();
+    cout << rightLeftRotateTest[13] << endl;
+    rightLeftRotateTest[13] = 22;
+    cout << rightLeftRotateTest[13] << endl;
 }
