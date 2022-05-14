@@ -28,6 +28,8 @@ class AVL {
             delete _left;
             delete _right;
         }
+
+        // printing util
         friend ostream &operator<<(ostream &os, const Node &n) {
             if (n._left != nullptr)
                 os << *n._left;
@@ -36,7 +38,6 @@ class AVL {
                 os << *n._right;
             return os;
         }
-
         // this only returns the key:value pair
         string to_string() const {
             ostringstream ret;
@@ -91,10 +92,12 @@ class AVL {
             return get_nth_gen(n, ret);
         }
     };
+
     class KeyNotFoundException : public logic_error {
        public:
         KeyNotFoundException(const char *what) : logic_error(what){};
     };
+
     Node *_root;
     V _default_val;
 
