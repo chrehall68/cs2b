@@ -1,7 +1,16 @@
 #include <iomanip>
 #include <iostream>
+#include <string>
 #include <vector>
 using namespace std;
+
+string operator*(string a, size_t times) {
+    string ret;
+    for (int i = 0; i < times; i++) {
+        ret += a;
+    }
+    return ret;
+}
 
 template <typename K, typename V>
 class AVL {
@@ -206,9 +215,15 @@ class AVL {
         int spacing = 6;
         int width = spacing * (1 << _root->height());
 
+        cout << string("-") * width << endl;
         for (int i = 1; i <= _root->height(); i++) {
-            cout << setw((width - spacing * (1 << i - 1)) / 2) << "";
+            // calculate margin between
+            int margin_between = (width - spacing * (1 << (i - 1))) / ((1 << (i - 1)) + 1);
+            string spacer = string(" ") * margin_between;
+
+            // print the layer
             for (Node *n : _root->get_nth_gen(i)) {
+                cout << spacer;
                 if (n == nullptr)
                     cout << setw(spacing) << "null";
                 else
@@ -216,6 +231,7 @@ class AVL {
             }
             cout << "\n\n";
         }
+        cout << string("-") * width << endl;
     }
 };
 
